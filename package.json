@@ -1,0 +1,29 @@
+{
+  "name": "demo-playwright-automation-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:ci": "playwright test --reporter=line,html",
+    "test:headed": "playwright test --headed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.3"
+  },
+  "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
+    "@types/cheerio": "^0.22.35",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.3.1",
+    "googleapis": "^171.4.0"
+  },
+  "overrides": {
+    "google-auth-library": "10.6.1"
+  }
+}

@@ -1,0 +1,72 @@
+name: Playwright CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      run_gmail_e2e:
+        description: 'Run Gmail-dependent tests'
+        required: false
+        type: choice
+        default: 'false'
+        options:
+          - 'false'
+          - 'true'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      BASE_URL: ${{ vars.BASE_URL || 'https://portal.dev.mehan.ae' }}
+      LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+      RUN_GMAIL_E2E: ${{ inputs.run_gmail_e2e || 'false' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check required secrets
+        id: secrets_check
+        run: |
+          if [[ -n "${LOGIN_EMAIL}" && -n "${LOGIN_PASSWORD}" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::LOGIN_EMAIL / LOGIN_PASSWORD are not configured. Browser tests will be skipped."
+          fi
+
+      - name: Install Playwright Browsers
+        if: ${{ steps.secrets_check.outputs.ready == 'true' }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        if: ${{ steps.secrets_check.outputs.ready == 'true' }}
+        run: npm run test:ci
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.secrets_check.outputs.ready == 'true' }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

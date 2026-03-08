@@ -1,0 +1,29 @@
+
+# Dependencies
+node_modules/
+
+# Playwright artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Environment variables (NEVER commit)
+.env
+.env.local
+.env.*.local
+
+# Local credentials / auth tokens (NEVER commit)
+credentials.json
+token.json
+auth.json
+playwright/.auth/*.json
+
+# Common secret/key files
+*.pem
+*.key
+*.p12
+
+# OS/editor noise
+.DS_Store
