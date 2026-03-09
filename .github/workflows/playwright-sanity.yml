@@ -1,23 +1,15 @@
-name: Playwright CI (Regression)
+name: Playwright CI (Sanity)
 
 on:
-  schedule:
-    - cron: '0 2 * * *'
+  push:
+    branches: [main, master]
   workflow_dispatch:
     inputs:
-      run_gmail_e2e:
-        description: 'Run Gmail-dependent tests'
-        required: false
-        type: choice
-        default: 'true'
-        options:
-          - 'false'
-          - 'true'
       artifact_mode:
         description: 'CI artifact detail level'
         required: false
         type: choice
-        default: 'full'
+        default: 'failures'
         options:
           - 'failures'
           - 'full'
@@ -34,20 +26,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard_index: [1, 2, 3, 4]
-    timeout-minutes: 90
+        shard_index: [1, 2]
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
       CI: true
-      SHARD_TOTAL: 4
+      SHARD_TOTAL: 2
       BASE_URL: ${{ vars.BASE_URL || 'https://portal.dev.mehan.ae' }}
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-      GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
-      GMAIL_CREDENTIALS_JSON: ${{ secrets.GMAIL_CREDENTIALS_JSON }}
-      GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
-      RUN_GMAIL_E2E: ${{ github.event.inputs.run_gmail_e2e || 'true' }}
-      CI_ARTIFACTS: ${{ github.event.inputs.artifact_mode || 'full' }}
+      RUN_GMAIL_E2E: 'false'
+      CI_ARTIFACTS: ${{ github.event.inputs.artifact_mode || 'failures' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -72,39 +61,24 @@ jobs:
         id: secrets_check
         run: |
           if [[ -n "${LOGIN_EMAIL}" && -n "${LOGIN_PASSWORD}" ]]; then
-            if [[ "${RUN_GMAIL_E2E}" == "true" ]]; then
-              if [[ -n "${GMAIL_CREDENTIALS_JSON}" && -n "${GMAIL_TOKEN_JSON}" ]]; then
-                echo "ready=true" >> "$GITHUB_OUTPUT"
-              else
-                echo "ready=false" >> "$GITHUB_OUTPUT"
-                echo "::warning::RUN_GMAIL_E2E=true but GMAIL_CREDENTIALS_JSON / GMAIL_TOKEN_JSON are missing."
-              fi
-            else
-              echo "ready=true" >> "$GITHUB_OUTPUT"
-            fi
+            echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::LOGIN_EMAIL / LOGIN_PASSWORD are not configured. Regression tests will be skipped."
+            echo "::warning::LOGIN_EMAIL / LOGIN_PASSWORD are not configured. Sanity tests will be skipped."
           fi
-
-      - name: Prepare Gmail auth files
-        if: ${{ steps.secrets_check.outputs.ready == 'true' && env.RUN_GMAIL_E2E == 'true' }}
-        run: |
-          printf '%s' "$GMAIL_CREDENTIALS_JSON" > credentials.json
-          printf '%s' "$GMAIL_TOKEN_JSON" > token.json
 
       - name: Install Playwright Browsers
         if: ${{ steps.secrets_check.outputs.ready == 'true' }}
         run: npx playwright install chromium
 
-      - name: Run Regression tests
+      - name: Run Sanity tests
         if: ${{ steps.secrets_check.outputs.ready == 'true' }}
-        run: npx playwright test --grep @regression --reporter=blob --shard=${{ matrix.shard_index }}/${{ env.SHARD_TOTAL }}
+        run: npx playwright test --grep @sanity --grep-invert @gmail --reporter=blob --shard=${{ matrix.shard_index }}/${{ env.SHARD_TOTAL }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ always() && !cancelled() && steps.secrets_check.outputs.ready == 'true' }}
         with:
-          name: regression-blob-report-${{ matrix.shard_index }}
+          name: sanity-blob-report-${{ matrix.shard_index }}
           path: blob-report/
           retention-days: 1
 
@@ -128,7 +102,7 @@ jobs:
         continue-on-error: true
         with:
           path: all-blob-reports
-          pattern: regression-blob-report-*
+          pattern: sanity-blob-report-*
           merge-multiple: true
 
       - name: Check blob reports directory
@@ -138,7 +112,7 @@ jobs:
             echo "has_reports=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_reports=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::No regression blob reports found. Skipping merge."
+            echo "::warning::No sanity blob reports found. Skipping merge."
           fi
 
       - name: Merge to HTML report
@@ -148,6 +122,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ steps.blob_check.outputs.has_reports == 'true' }}
         with:
-          name: playwright-report-regression
+          name: playwright-report-sanity
           path: playwright-report/
-          retention-days: 30
+          retention-days: 14

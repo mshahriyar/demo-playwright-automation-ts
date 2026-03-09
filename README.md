@@ -250,19 +250,21 @@ Recommended: replace these with `GMAIL_EMAIL`-driven values to make local setup 
 
 ## CI Behavior (Current)
 
-- Fast workflow: `.github/workflows/playwright.yml`
-  - Trigger: push + PR (+ manual run)
-  - Purpose: fast feedback for main quality checks
-  - Gmail tests: disabled (`RUN_GMAIL_E2E=false`)
-  - Output: merged HTML report artifact `playwright-report-fast`
-- Nightly/full workflow: `.github/workflows/playwright-nightly.yml`
+- Smoke workflow: `.github/workflows/playwright.yml`
+  - Trigger: pull request + manual run
+  - Test selection: `@smoke` (Gmail excluded)
+  - Output: merged HTML report artifact `playwright-report-smoke`
+- Sanity workflow: `.github/workflows/playwright-sanity.yml`
+  - Trigger: push to main/master + manual run
+  - Test selection: `@sanity` (Gmail excluded)
+  - Output: merged HTML report artifact `playwright-report-sanity`
+- Regression workflow: `.github/workflows/playwright-nightly.yml`
   - Trigger: schedule + manual run
-  - Purpose: deeper coverage and optional Gmail validation
-  - Gmail tests: enabled by default for nightly (`RUN_GMAIL_E2E=true`)
+  - Test selection: `@regression` (Gmail included when `RUN_GMAIL_E2E=true`)
   - Required secrets for Gmail mode:
     - `GMAIL_CREDENTIALS_JSON` (raw `credentials.json`)
     - `GMAIL_TOKEN_JSON` (raw `token.json` with refresh token)
-  - Output: merged HTML report artifact `playwright-report-nightly`
+  - Output: merged HTML report artifact `playwright-report-regression`
 - Blob artifacts are internal merge inputs for sharded runs and kept short-lived.
 
 ## Reports and Debugging

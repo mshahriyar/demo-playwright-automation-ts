@@ -1,8 +1,6 @@
-name: Playwright CI (Fast)
+name: Playwright CI (Smoke)
 
 on:
-  push:
-    branches: [main, master]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -29,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         shard_index: [1, 2]
-    timeout-minutes: 60
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -66,21 +64,21 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::LOGIN_EMAIL / LOGIN_PASSWORD are not configured. Browser tests will be skipped."
+            echo "::warning::LOGIN_EMAIL / LOGIN_PASSWORD are not configured. Smoke tests will be skipped."
           fi
 
       - name: Install Playwright Browsers
         if: ${{ steps.secrets_check.outputs.ready == 'true' }}
         run: npx playwright install chromium
 
-      - name: Run Playwright tests
+      - name: Run Smoke tests
         if: ${{ steps.secrets_check.outputs.ready == 'true' }}
-        run: npx playwright test --reporter=blob --shard=${{ matrix.shard_index }}/${{ env.SHARD_TOTAL }}
+        run: npx playwright test --grep @smoke --grep-invert @gmail --reporter=blob --shard=${{ matrix.shard_index }}/${{ env.SHARD_TOTAL }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ always() && !cancelled() && steps.secrets_check.outputs.ready == 'true' }}
         with:
-          name: fast-blob-report-${{ matrix.shard_index }}
+          name: smoke-blob-report-${{ matrix.shard_index }}
           path: blob-report/
           retention-days: 1
 
@@ -104,7 +102,7 @@ jobs:
         continue-on-error: true
         with:
           path: all-blob-reports
-          pattern: fast-blob-report-*
+          pattern: smoke-blob-report-*
           merge-multiple: true
 
       - name: Check blob reports directory
@@ -114,7 +112,7 @@ jobs:
             echo "has_reports=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_reports=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::No blob reports found. Skipping merge."
+            echo "::warning::No smoke blob reports found. Skipping merge."
           fi
 
       - name: Merge to HTML report
@@ -124,6 +122,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ steps.blob_check.outputs.has_reports == 'true' }}
         with:
-          name: playwright-report-fast
+          name: playwright-report-smoke
           path: playwright-report/
           retention-days: 14
