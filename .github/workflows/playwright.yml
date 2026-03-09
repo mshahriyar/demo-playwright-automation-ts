@@ -126,16 +126,30 @@ jobs:
         run: npm ci
 
       - name: Download blob reports
+        id: download_blob
         uses: actions/download-artifact@v4
         with:
           path: all-blob-reports
           pattern: blob-report-*
           merge-multiple: true
+          if-no-files-found: ignore
+
+      - name: Check blob reports directory
+        id: blob_check
+        run: |
+          if [[ -d all-blob-reports ]] && [[ -n "$(ls -A all-blob-reports 2>/dev/null)" ]]; then
+            echo "has_reports=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_reports=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No blob reports found. Skipping merge."
+          fi
 
       - name: Merge to HTML report
+        if: ${{ steps.blob_check.outputs.has_reports == 'true' }}
         run: npx playwright merge-reports --reporter=html ./all-blob-reports
 
       - uses: actions/upload-artifact@v4
+        if: ${{ steps.blob_check.outputs.has_reports == 'true' }}
         with:
           name: playwright-report
           path: playwright-report/
