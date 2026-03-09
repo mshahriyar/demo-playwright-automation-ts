@@ -2,7 +2,7 @@ import { test, expect } from '../../fixtures/testFixtures'
 
 test.describe('Home Dashboard', () => {
 
-    test('Dashboard page loads successfully', async ({ homePage }) => {
+    test('Dashboard page loads successfully @smoke @sanity @regression', async ({ homePage }) => {
 
         await homePage.open()
 
@@ -11,7 +11,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Validate all dashboard cards', async ({ homePage }) => {
+    test('Validate all dashboard cards @sanity @regression', async ({ homePage }) => {
 
         await homePage.open()
 
@@ -20,7 +20,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Active Job Posts card navigation', async ({ homePage, page }) => {
+    test('Active Job Posts card navigation @sanity @regression', async ({ homePage, page }) => {
 
         await homePage.open()
 
@@ -31,7 +31,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Chats card navigation', async ({ homePage, page }) => {
+    test('Chats card navigation @sanity @regression', async ({ homePage, page }) => {
 
         await homePage.open()
 
@@ -42,7 +42,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Pending contracts card navigation', async ({ homePage, page }) => {
+    test('Pending contracts card navigation @sanity @regression', async ({ homePage, page }) => {
 
         await homePage.open()
 
@@ -53,7 +53,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Unread messages card navigation', async ({ homePage, page }) => {
+    test('Unread messages card navigation @sanity @regression', async ({ homePage, page }) => {
 
         await homePage.open()
 
@@ -64,7 +64,7 @@ test.describe('Home Dashboard', () => {
     })
 
 
-    test('Recommended candidates card navigation', async ({ homePage, page }) => {
+    test('Recommended candidates card navigation @sanity @regression', async ({ homePage, page }) => {
 
         await homePage.open()
 

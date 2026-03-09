@@ -1,7 +1,7 @@
 import { test, expect } from '../../fixtures/testFixtures'
 import { config } from '../../utils/config'
 
-test('Login with valid credentials', async ({ loginPage }) => {
+test('Login with valid credentials @smoke @sanity @regression', async ({ loginPage }) => {
   await loginPage.open()
   await loginPage.clickLoginTab()
   await loginPage.login(config.loginEmail, config.loginPassword)
@@ -9,7 +9,7 @@ test('Login with valid credentials', async ({ loginPage }) => {
   await loginPage.expectLoginSuccess()
 })
 
-test('Login with valid email and invalid password', async ({ loginPage }) => {
+test('Login with valid email and invalid password @sanity @regression', async ({ loginPage }) => {
   await loginPage.open()
   await loginPage.clickLoginTab()
   await loginPage.login(config.loginEmail, 'WrongPassword@123')
@@ -17,7 +17,7 @@ test('Login with valid email and invalid password', async ({ loginPage }) => {
   await loginPage.clickGoBack()
 })
 
-test('Login with invalid email', async ({ loginPage }) => {
+test('Login with invalid email @sanity @regression', async ({ loginPage }) => {
   await loginPage.open()
   await loginPage.clickLoginTab()
   await loginPage.login('invalid.email@test.com', config.loginPassword)
@@ -25,7 +25,7 @@ test('Login with invalid email', async ({ loginPage }) => {
   await loginPage.clickGoBack()
 })
 
-test('Toggle password visibility', async ({ loginPage }) => {
+test('Toggle password visibility @sanity @regression', async ({ loginPage }) => {
   await loginPage.open()
   await loginPage.clickLoginTab()
   await loginPage.enterPassword(config.loginPassword)

@@ -9,7 +9,7 @@ test.skip(
   'Set RUN_GMAIL_E2E=true to run Gmail-dependent tests.'
 )
 
-test('Sign-up and resend-flow with email verification)', async ({ page, signUpPage }) => {
+test('Sign-up and resend-flow with email verification) @regression @gmail', async ({ page, signUpPage }) => {
     await signUpPage.open()
 
     await signUpPage.clickSignUpTab()

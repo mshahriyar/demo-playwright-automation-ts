@@ -6,7 +6,11 @@
   "scripts": {
     "test:e2e": "playwright test",
     "test:ci": "playwright test --reporter=line,html",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "smoke": "playwright test --grep @smoke --grep-invert @gmail",
+    "sanity": "playwright test --grep @sanity --grep-invert @gmail",
+    "regression": "RUN_GMAIL_E2E=true playwright test --grep @regression",
+    "regression:no-gmail": "playwright test --grep @regression --grep-invert @gmail"
   },
   "keywords": [],
   "author": "",

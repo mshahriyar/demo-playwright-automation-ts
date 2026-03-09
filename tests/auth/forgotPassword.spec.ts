@@ -8,7 +8,7 @@ test.skip(
   'Set RUN_GMAIL_E2E=true to run Gmail-dependent tests.'
 )
 
-test('Forgot Password Flow', async ({ forgotPasswordPage, page }) => {
+test('Forgot Password Flow @regression @gmail', async ({ forgotPasswordPage, page }) => {
 
     await forgotPasswordPage.open()
 

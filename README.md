@@ -130,6 +130,30 @@ Run with CI-style reporter:
 npm run test:ci
 ```
 
+Run smoke suite (fast, no Gmail):
+
+```bash
+npm run smoke
+```
+
+Run sanity suite (broader, no Gmail):
+
+```bash
+npm run sanity
+```
+
+Run regression suite (includes Gmail tests by default):
+
+```bash
+npm run regression
+```
+
+Run regression without Gmail:
+
+```bash
+npm run regression:no-gmail
+```
+
 Run headed mode:
 
 ```bash
@@ -226,9 +250,20 @@ Recommended: replace these with `GMAIL_EMAIL`-driven values to make local setup 
 
 ## CI Behavior (Current)
 
-- CI runs Playwright safely with repository secrets for app login.
-- Gmail tests are skipped unless `RUN_GMAIL_E2E=true`.
-- For public-repo safety, keep Gmail flows disabled in default CI and execute them locally or in a protected secure workflow.
+- Fast workflow: `.github/workflows/playwright.yml`
+  - Trigger: push + PR (+ manual run)
+  - Purpose: fast feedback for main quality checks
+  - Gmail tests: disabled (`RUN_GMAIL_E2E=false`)
+  - Output: merged HTML report artifact `playwright-report-fast`
+- Nightly/full workflow: `.github/workflows/playwright-nightly.yml`
+  - Trigger: schedule + manual run
+  - Purpose: deeper coverage and optional Gmail validation
+  - Gmail tests: enabled by default for nightly (`RUN_GMAIL_E2E=true`)
+  - Required secrets for Gmail mode:
+    - `GMAIL_CREDENTIALS_JSON` (raw `credentials.json`)
+    - `GMAIL_TOKEN_JSON` (raw `token.json` with refresh token)
+  - Output: merged HTML report artifact `playwright-report-nightly`
+- Blob artifacts are internal merge inputs for sharded runs and kept short-lived.
 
 ## Reports and Debugging
 
