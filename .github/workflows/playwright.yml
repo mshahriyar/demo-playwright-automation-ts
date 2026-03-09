@@ -15,6 +15,14 @@ on:
         options:
           - 'false'
           - 'true'
+      artifact_mode:
+        description: 'CI artifact detail level'
+        required: false
+        type: choice
+        default: 'failures'
+        options:
+          - 'failures'
+          - 'full'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +42,7 @@ jobs:
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
       GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
       RUN_GMAIL_E2E: ${{ inputs.run_gmail_e2e || 'false' }}
+      CI_ARTIFACTS: ${{ inputs.artifact_mode || 'failures' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +51,14 @@ jobs:
         with:
           node-version: 20
           cache: npm
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
 
       - name: Install dependencies
         run: npm ci
