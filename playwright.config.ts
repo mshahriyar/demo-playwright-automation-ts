@@ -13,7 +13,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: isCI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: isCI ? 2 : undefined,
+  workers: isCI ? 1 : 50%,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['list'], ['html', { open: 'never' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -25,9 +25,9 @@ export default defineConfig({
      * CI defaults to failure-only artifacts for speed.
      * Set CI_ARTIFACTS=full to force full trace/video/screenshot capture.
      */
-    trace: fullArtifacts ? 'on' : (isCI ? 'retain-on-failure' : 'on'),
-    video: fullArtifacts ? 'on' : (isCI ? 'retain-on-failure' : 'on'),
-    screenshot: fullArtifacts ? 'on' : (isCI ? 'only-on-failure' : 'on'),
+    trace: fullArtifacts ? 'on' : (isCI ? 'retain-on-failure' : 'off'),
+    video: fullArtifacts ? 'on' : (isCI ? 'retain-on-failure' : 'off'),
+    screenshot: fullArtifacts ? 'on' : 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
