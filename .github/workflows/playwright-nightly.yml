@@ -44,6 +44,7 @@ jobs:
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
       GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+      FORGOT_PASSWORD_EMAIL: ${{ secrets.FORGOT_PASSWORD_EMAIL }}
       GMAIL_CREDENTIALS_JSON: ${{ secrets.GMAIL_CREDENTIALS_JSON }}
       GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
       RUN_GMAIL_E2E: ${{ github.event.inputs.run_gmail_e2e || 'true' }}
@@ -73,11 +74,11 @@ jobs:
         run: |
           if [[ -n "${LOGIN_EMAIL}" && -n "${LOGIN_PASSWORD}" ]]; then
             if [[ "${RUN_GMAIL_E2E}" == "true" ]]; then
-              if [[ -n "${GMAIL_CREDENTIALS_JSON}" && -n "${GMAIL_TOKEN_JSON}" ]]; then
+              if [[ -n "${GMAIL_CREDENTIALS_JSON}" && -n "${GMAIL_TOKEN_JSON}" && -n "${GMAIL_EMAIL}" ]]; then
                 echo "ready=true" >> "$GITHUB_OUTPUT"
               else
                 echo "ready=false" >> "$GITHUB_OUTPUT"
-                echo "::warning::RUN_GMAIL_E2E=true but GMAIL_CREDENTIALS_JSON / GMAIL_TOKEN_JSON are missing."
+                echo "::warning::RUN_GMAIL_E2E=true but one or more required values are missing: GMAIL_EMAIL, GMAIL_CREDENTIALS_JSON, GMAIL_TOKEN_JSON."
               fi
             else
               echo "ready=true" >> "$GITHUB_OUTPUT"

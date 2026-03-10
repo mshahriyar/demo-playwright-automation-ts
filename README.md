@@ -231,16 +231,22 @@ RUN_GMAIL_E2E=true
 
 ### 5) Project-specific Gmail defaults to adjust
 
-This repository currently contains a few project-specific test values. If you use your own inbox, update these before running Gmail tests:
+This repository now uses env-driven Gmail targets:
 
-- `tests/auth/forgotPassword.spec.ts`
-  - `enterEmail('testqashahriyar3@gmail.com')`
-- `utils/gmailService.ts`
-  - Gmail query includes `to:testqashahriyar3@gmail.com`
-- `utils/passwordGenerator.ts`
-  - Sign-up email generator uses alias `testqashahriyar3+...@gmail.com`
+- `GMAIL_EMAIL`:
+  - Base inbox for sign-up email alias generation (`name+random@domain`)
+  - Recipient filter for sign-up verification polling
+- `FORGOT_PASSWORD_EMAIL`:
+  - Email entered in forgot-password flow
+  - Recipient filter for reset email polling
 
-Recommended: replace these with `GMAIL_EMAIL`-driven values to make local setup portable for all contributors.
+Recommended local `.env`:
+
+```env
+GMAIL_EMAIL=your_test_gmail@gmail.com
+FORGOT_PASSWORD_EMAIL=your_registered_test_user@gmail.com
+RUN_GMAIL_E2E=true
+```
 
 ### 6) Keep secrets safe
 
@@ -262,6 +268,7 @@ Recommended: replace these with `GMAIL_EMAIL`-driven values to make local setup 
   - Trigger: schedule + manual run
   - Test selection: `@regression` (Gmail included when `RUN_GMAIL_E2E=true`)
   - Required secrets for Gmail mode:
+    - `FORGOT_PASSWORD_EMAIL` (optional; defaults to `GMAIL_EMAIL` if missing)
     - `GMAIL_CREDENTIALS_JSON` (raw `credentials.json`)
     - `GMAIL_TOKEN_JSON` (raw `token.json` with refresh token)
   - Output: merged HTML report artifact `playwright-report-regression`

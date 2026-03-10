@@ -97,16 +97,13 @@ function extractVerifyLink(html: string): string | null {
   return match ? match[1] : null
 }
 
-async function getLatestResetLink(): Promise<{ link: string | null; html: string }> {
+async function getLatestResetLink(recipientEmail: string): Promise<{ link: string | null; html: string }> {
 
   const gmail = await getGmailClient()
 
   const res = await gmail.users.messages.list({
     userId: 'me',
-
-    // Only fetch recent reset emails
-    q: 'to:testqashahriyar3@gmail.com subject:"Password reset request" newer_than:5m',
-
+    q: `to:${recipientEmail} subject:"Password reset request" newer_than:5m`,
     maxResults: 10
   })
 
@@ -180,6 +177,7 @@ async function getLatestResetLink(): Promise<{ link: string | null; html: string
   return { link: null, html: '' }
 }
 export async function waitForResetLink(
+  recipientEmail: string,
   retries = 12,
   delay = 2000,
   initialDelay = 7000
@@ -191,7 +189,7 @@ export async function waitForResetLink(
 
   for (let i = 0; i < retries; i++) {
 
-    const { link, html } = await getLatestResetLink()
+    const { link, html } = await getLatestResetLink(recipientEmail)
 
     if (link) {
 

@@ -7,6 +7,7 @@ type AppConfig = {
   loginPassword: string
   baseUrl: string
   gmailEmail: string
+  forgotPasswordEmail: string
   defaultTimeout: number
   mailWaitTimeout: number
   environment: string
@@ -20,6 +21,7 @@ export const config: AppConfig = {
   baseUrl: process.env.BASE_URL ?? 'https://portal.dev.mehan.ae',
 
   gmailEmail: process.env.GMAIL_EMAIL ?? '',
+  forgotPasswordEmail: process.env.FORGOT_PASSWORD_EMAIL ?? process.env.GMAIL_EMAIL ?? '',
 
   defaultTimeout: parseInt(process.env.DEFAULT_TIMEOUT ?? '30000', 10),
   mailWaitTimeout: parseInt(process.env.MAIL_WAIT_TIMEOUT ?? '60000', 10),

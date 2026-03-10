@@ -2,6 +2,7 @@ import { test, expect } from '../../fixtures/testFixtures'
 import { waitForResetLink } from '../../utils/gmailService'
 import { validateResetEmail } from '../../utils/resetPasswordEmailValidator'
 import { generatePassword } from '../../utils/passwordGenerator'
+import { config } from '../../utils/config'
 
 test.skip(
   process.env.RUN_GMAIL_E2E !== 'true',
@@ -9,6 +10,7 @@ test.skip(
 )
 
 test('Forgot Password Flow @regression @gmail', async ({ forgotPasswordPage, page }) => {
+    const resetEmail = config.forgotPasswordEmail
 
     await forgotPasswordPage.open()
 
@@ -18,13 +20,13 @@ test('Forgot Password Flow @regression @gmail', async ({ forgotPasswordPage, pag
 
     await expect(forgotPasswordPage.forgotPasswordPageTitle).toBeVisible()
 
-    await forgotPasswordPage.enterEmail('testqashahriyar3@gmail.com')
+    await forgotPasswordPage.enterEmail(resetEmail)
 
     await forgotPasswordPage.clickSubmit()
 
     await forgotPasswordPage.expectSuccessMessage()
 
-    const { link, html } = await waitForResetLink()
+    const { link, html } = await waitForResetLink(resetEmail)
 
     // Validate email content
     validateResetEmail(html)

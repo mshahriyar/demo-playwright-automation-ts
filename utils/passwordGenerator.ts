@@ -80,9 +80,16 @@ export function generateStrongPassword(): string {
  * Format: 50XXXXXXX (e.g., 501234567)
  * @returns A random phone number string
  */
-export function generateRandomEmail(): string {
-  const randomNum = Math.floor(Math.random() * 900) + 10; // Generates a number between 10 and 9009
-  return `testqashahriyar3+${randomNum}@gmail.com`;
+export function generateRandomEmail(baseEmail: string): string {
+  const [localPartWithAlias, domain] = baseEmail.split('@')
+  if (!localPartWithAlias || !domain) {
+    throw new Error(`Invalid base email provided for alias generation: ${baseEmail}`)
+  }
+
+  // If base email already has +alias, keep only root local-part
+  const localPart = localPartWithAlias.split('+')[0]
+  const randomNum = `${Date.now()}${Math.floor(Math.random() * 1000)}`
+  return `${localPart}+${randomNum}@${domain}`
 }
 
 export function generateRandomPhoneNumber(): string {

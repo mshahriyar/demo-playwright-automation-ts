@@ -3,6 +3,7 @@ import { generateRandomEmail } from '../../utils/passwordGenerator'
 import { waitForSignUpVerificationLink } from '../../utils/gmailService'
 import { validateSignUpEmail } from '../../utils/resetPasswordEmailValidator'
 import { generateRandomPhoneNumber } from '../../utils/passwordGenerator'
+import { config } from '../../utils/config'
 
 test.skip(
   process.env.RUN_GMAIL_E2E !== 'true',
@@ -22,7 +23,7 @@ test('Sign-up and resend-flow with email verification) @regression @gmail', asyn
     await signUpPage.fillLastName('Abid')
 
     // generate one address and reuse it for the resend step
-    const email = generateRandomEmail()
+    const email = generateRandomEmail(config.gmailEmail)
     await signUpPage.fillEmail(email)
     await signUpPage.fillPhoneNumber(generateRandomPhoneNumber())
     await signUpPage.fillPassword('Shery@1234')
