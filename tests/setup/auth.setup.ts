@@ -6,7 +6,7 @@ import { config } from '../../utils/config'
  * Logs in and saves the browser state (cookies, localStorage, etc.)
  * All subsequent tests reuse this authenticated state
  */
-setup('authenticate user @smoke @sanity @regression', async ({ page }) => {
+setup('authenticate user', async ({ page }) => {
   console.log('🔐 Authenticating user...')
 
   // Navigate to login
